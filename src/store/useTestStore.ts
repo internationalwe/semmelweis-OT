@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Question, Answer, TestState, QuestionSet } from '../types';
 
 interface TestStore {
@@ -6,6 +7,7 @@ interface TestStore {
   questionSets: QuestionSet[];
   addQuestionSet: (set: QuestionSet) => void;
   selectSetAndStart: (setId: string) => void;
+  deleteQuestionSet: (setId: string) => void;
   
   questions: Question[];
   setQuestions: (questions: Question[]) => void;
@@ -31,7 +33,9 @@ interface TestStore {
 
 const TOTAL_TIME_SECONDS = 20 * 60; // 20 minutes
 
-export const useTestStore = create<TestStore>((set) => ({
+export const useTestStore = create<TestStore>()(
+  persist(
+    (set) => ({
   questionSets: [],
   questions: [],
   testState: 'HOME',
@@ -46,6 +50,10 @@ export const useTestStore = create<TestStore>((set) => ({
   addQuestionSet: (newSet) => set((state) => ({ 
     questionSets: [...state.questionSets, newSet],
     testState: 'HOME'
+  })),
+
+  deleteQuestionSet: (setId) => set((state) => ({
+    questionSets: state.questionSets.filter(s => s.id !== setId)
   })),
 
   selectSetAndStart: (setId) => set((state) => {
@@ -113,4 +121,10 @@ export const useTestStore = create<TestStore>((set) => ({
     timerActive: false,
     questions: []
   })
-}));
+    }),
+    {
+      name: 'online-test-store',
+      partialize: (state) => ({ questionSets: state.questionSets }),
+    }
+  )
+);

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTestStore } from '../store/useTestStore';
-import { BookOpen, PlusCircle, Play } from 'lucide-react';
+import { BookOpen, PlusCircle, Play, Trash2 } from 'lucide-react';
 
 export const HomeScreen: React.FC = () => {
-  const { questionSets, setTestState, selectSetAndStart } = useTestStore();
+  const { questionSets, setTestState, selectSetAndStart, deleteQuestionSet } = useTestStore();
 
   return (
     <div className="max-w-[1000px] mx-auto min-h-screen p-6 md:p-10">
@@ -35,7 +35,16 @@ export const HomeScreen: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {questionSets.map((set) => (
             <div key={set.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-800 mb-2 truncate" title={set.name}>{set.name}</h3>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-xl font-bold text-gray-800 truncate pr-2" title={set.name}>{set.name}</h3>
+                <button 
+                  onClick={() => deleteQuestionSet(set.id)}
+                  className="text-gray-400 hover:text-red-500 transition-colors p-1 -mt-1 -mr-1"
+                  title="Delete Set"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
               <p className="text-gray-500 mb-6">{set.questions.length} questions</p>
               
               <button
