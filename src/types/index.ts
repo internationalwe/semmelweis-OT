@@ -11,6 +11,12 @@ export type Question = {
   correctAnswerId?: string; // Optional for practice, but normally required
 };
 
+export type QuestionSet = {
+  id: string;
+  name: string;
+  questions: Question[];
+};
+
 export type Answer = {
   questionId: string;
   selectedOptionId: string | null;
@@ -26,4 +32,4 @@ export type TestResult = {
   answers: Answer[];
 };
 
-export type TestState = 'INPUT' | 'TAKING' | 'RESULT';
+export type TestState = 'HOME' | 'INPUT' | 'TAKING' | 'RESULT';

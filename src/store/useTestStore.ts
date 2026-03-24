@@ -1,8 +1,12 @@
 import { create } from 'zustand';
-import type { Question, Answer, TestState } from '../types';
+import type { Question, Answer, TestState, QuestionSet } from '../types';
 
 interface TestStore {
   // Test Data
+  questionSets: QuestionSet[];
+  addQuestionSet: (set: QuestionSet) => void;
+  selectSetAndStart: (setId: string) => void;
+  
   questions: Question[];
   setQuestions: (questions: Question[]) => void;
   addQuestion: (question: Question) => void;
@@ -28,8 +32,9 @@ interface TestStore {
 const TOTAL_TIME_SECONDS = 20 * 60; // 20 minutes
 
 export const useTestStore = create<TestStore>((set) => ({
+  questionSets: [],
   questions: [],
-  testState: 'INPUT',
+  testState: 'HOME',
   currentQuestionIndex: 0,
   answers: [],
   timeRemainingSeconds: TOTAL_TIME_SECONDS,
@@ -38,6 +43,24 @@ export const useTestStore = create<TestStore>((set) => ({
   setQuestions: (questions) => set({ questions }),
   addQuestion: (question) => set((state) => ({ questions: [...state.questions, question] })),
   
+  addQuestionSet: (newSet) => set((state) => ({ 
+    questionSets: [...state.questionSets, newSet],
+    testState: 'HOME'
+  })),
+
+  selectSetAndStart: (setId) => set((state) => {
+    const setObj = state.questionSets.find(s => s.id === setId);
+    if (!setObj) return state;
+    return {
+      questions: setObj.questions,
+      testState: 'TAKING',
+      currentQuestionIndex: 0,
+      answers: [],
+      timeRemainingSeconds: TOTAL_TIME_SECONDS,
+      timerActive: true,
+    };
+  }),
+
   setTestState: (testState) => set({ testState }),
 
   startTest: () => set({
@@ -83,7 +106,7 @@ export const useTestStore = create<TestStore>((set) => ({
   finishTest: () => set({ testState: 'RESULT', timerActive: false }),
 
   resetTest: () => set({
-    testState: 'INPUT',
+    testState: 'HOME',
     currentQuestionIndex: 0,
     answers: [],
     timeRemainingSeconds: TOTAL_TIME_SECONDS,
