@@ -37,7 +37,7 @@ export const InputScreen: React.FC = () => {
           return {
             id: `q-${idx}-${Date.now()}`,
             text: row['Question'] || 'Empty Question',
-            correctAnswerId: row['Answer'] || 'A',
+            correctAnswerId: row['정답'] || row['Answer'] || 'A',
             options: [
               { id: 'A', text: row['A'] || '' },
               { id: 'B', text: row['B'] || '' },
@@ -51,7 +51,9 @@ export const InputScreen: React.FC = () => {
         addQuestionSet({
           id: `set-${Date.now()}`,
           name: setName,
-          questions: parsedQuestions
+          questions: parsedQuestions,
+          visibility: 'PRIVATE',
+          allowedIds: []
         });
       }
     });
@@ -87,7 +89,9 @@ export const InputScreen: React.FC = () => {
     addQuestionSet({
       id: `set-${Date.now()}`,
       name: setName,
-      questions: manualQs
+      questions: manualQs,
+      visibility: 'PRIVATE',
+      allowedIds: []
     });
   };
 
@@ -133,17 +137,19 @@ export const InputScreen: React.FC = () => {
         </div>
 
         {/* Content Area */}
-        <div className="w-full md:w-2/3 p-8 md:p-12">
+        <div className="w-full md:w-2/3 p-8 md:p-12 overflow-y-auto max-h-screen">
           
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Question Set Name</label>
-            <input 
-              type="text" 
-              value={setName}
-              onChange={(e) => setSetName(e.target.value)}
-              placeholder="e.g. Biology Midterm"
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Question Set Name</label>
+              <input 
+                type="text" 
+                value={setName}
+                onChange={(e) => setSetName(e.target.value)}
+                placeholder="e.g. Biology Midterm"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <hr className="my-6 border-gray-100" />
@@ -164,7 +170,7 @@ export const InputScreen: React.FC = () => {
                 <div className="text-4xl mb-4">📄</div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Upload CSV File</h3>
                 <p className="text-gray-500 text-sm">
-                  File must contain columns: Question, A, B, C, D, E, Answer
+                  File must contain columns: Question, A, B, C, D, E, <strong className="text-red-500">정답</strong>
                 </p>
               </div>
             </div>

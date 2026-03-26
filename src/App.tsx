@@ -1,6 +1,6 @@
-
 import { useTestStore } from './store/useTestStore';
 import { HomeScreen } from './components/HomeScreen';
+import { ManageScreen } from './components/ManageScreen';
 import { InputScreen } from './components/InputScreen';
 import { TestLayout } from './components/TestLayout';
 import { ResultScreen } from './components/ResultScreen';
@@ -14,6 +14,7 @@ function App() {
       {testState === 'INPUT' && <InputScreen />}
       {testState === 'TAKING' && <TestLayout />}
       {testState === 'RESULT' && <ResultScreen />}
+      {testState === 'MANAGE_SET' && <ManageScreen />}
     </div>
   );
 }

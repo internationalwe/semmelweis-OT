@@ -11,10 +11,14 @@ export type Question = {
   correctAnswerId?: string; // Optional for practice, but normally required
 };
 
+export type Visibility = 'PUBLIC' | 'PRIVATE' | 'RESTRICTED' | 'MARKETPLACE';
+
 export type QuestionSet = {
   id: string;
   name: string;
   questions: Question[];
+  visibility: Visibility;
+  allowedIds?: string[]; // Used only if visibility is RESTRICTED
 };
 
 export type Answer = {
@@ -32,4 +36,4 @@ export type TestResult = {
   answers: Answer[];
 };
 
-export type TestState = 'HOME' | 'INPUT' | 'TAKING' | 'RESULT';
+export type TestState = 'HOME' | 'INPUT' | 'TAKING' | 'RESULT' | 'MANAGE_SET';

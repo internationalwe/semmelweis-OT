@@ -1,12 +1,22 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Question, Answer, TestState, QuestionSet } from '../types';
+import type { Question, Answer, TestState, QuestionSet, Visibility } from '../types';
+
+export const MOCK_USER = {
+  id: 'user123',
+  isAdmin: false // Change this to true to test PUBLIC option
+};
 
 interface TestStore {
   // Test Data
   questionSets: QuestionSet[];
   addQuestionSet: (set: QuestionSet) => void;
   selectSetAndStart: (setId: string) => void;
+  
+  managingSetId: string | null;
+  openManageSet: (setId: string) => void;
+  updateSetVisibility: (setId: string, visibility: Visibility, allowedIds: string[]) => void;
   deleteQuestionSet: (setId: string) => void;
   
   questions: Question[];
@@ -37,6 +47,7 @@ export const useTestStore = create<TestStore>()(
   persist(
     (set) => ({
   questionSets: [],
+  managingSetId: null,
   questions: [],
   testState: 'HOME',
   currentQuestionIndex: 0,
@@ -47,6 +58,14 @@ export const useTestStore = create<TestStore>()(
   setQuestions: (questions) => set({ questions }),
   addQuestion: (question) => set((state) => ({ questions: [...state.questions, question] })),
   
+  openManageSet: (setId) => set({ managingSetId: setId, testState: 'MANAGE_SET' }),
+  
+  updateSetVisibility: (setId, visibility, allowedIds) => set((state) => ({
+    questionSets: state.questionSets.map(qs => 
+      qs.id === setId ? { ...qs, visibility, allowedIds } : qs
+    )
+  })),
+
   addQuestionSet: (newSet) => set((state) => ({ 
     questionSets: [...state.questionSets, newSet],
     testState: 'HOME'
@@ -119,7 +138,8 @@ export const useTestStore = create<TestStore>()(
     answers: [],
     timeRemainingSeconds: TOTAL_TIME_SECONDS,
     timerActive: false,
-    questions: []
+    questions: [],
+    managingSetId: null
   })
     }),
     {
