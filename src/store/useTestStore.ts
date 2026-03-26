@@ -1,14 +1,24 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Question, Answer, TestState, QuestionSet, Visibility } from '../types';
+import type { Question, Answer, TestState, QuestionSet, Visibility, User } from '../types';
 
-export const MOCK_USER = {
-  id: 'user123',
-  isAdmin: false // Change this to true to test PUBLIC option
-};
+export const INITIAL_ADMINS: User[] = [
+  { id: 'admin', name: 'System Admin (👑)', password: 'admin', isAdmin: true },
+];
 
 interface TestStore {
+  // Auth
+  users: User[];
+  currentUser: User | null;
+  login: (id: string, pw: string) => boolean;
+  register: (id: string, pw: string, name: string) => boolean;
+  logout: () => void;
+  
+  // Set Management
+  transferOwnership: (setId: string, newOwnerId: string) => boolean;
+  addCoAdmin: (setId: string, newAdminId: string) => boolean;
+  removeCoAdmin: (setId: string, adminIdToRemove: string) => void;
+
   // Test Data
   questionSets: QuestionSet[];
   addQuestionSet: (set: QuestionSet) => void;
@@ -45,11 +55,68 @@ const TOTAL_TIME_SECONDS = 20 * 60; // 20 minutes
 
 export const useTestStore = create<TestStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+  users: INITIAL_ADMINS,
+  currentUser: null,
+  
+  login: (id, pw) => {
+    const user = get().users.find(u => u.id === id && u.password === pw);
+    if (user) {
+      set({ currentUser: user, testState: 'HOME' });
+      return true;
+    }
+    return false;
+  },
+
+  register: (id, pw, name) => {
+    const exists = get().users.some(u => u.id === id);
+    if (exists) return false;
+    const newUser: User = { id, password: pw, name, isAdmin: false };
+    set(state => ({ users: [...state.users, newUser], currentUser: newUser, testState: 'HOME' }));
+    return true;
+  },
+
+  logout: () => set({ currentUser: null, testState: 'LOGIN' }),
+  
+  transferOwnership: (setId, newOwnerId) => {
+    const userExists = get().users.some(u => u.id === newOwnerId);
+    if (!userExists) return false;
+    
+    set((state) => ({
+      questionSets: state.questionSets.map(qs =>
+        qs.id === setId ? { ...qs, ownerId: newOwnerId, coAdminIds: qs.coAdminIds.filter(id => id !== newOwnerId) } : qs
+      )
+    }));
+    return true;
+  },
+
+  addCoAdmin: (setId, newAdminId) => {
+    const userExists = get().users.some(u => u.id === newAdminId);
+    if (!userExists) return false;
+
+    set((state) => ({
+      questionSets: state.questionSets.map(qs => {
+        if (qs.id === setId && qs.ownerId !== newAdminId && !qs.coAdminIds.includes(newAdminId)) {
+          return { ...qs, coAdminIds: [...qs.coAdminIds, newAdminId] };
+        }
+        return qs;
+      })
+    }));
+    return true;
+  },
+
+  removeCoAdmin: (setId, adminIdToRemove) => {
+    set((state) => ({
+      questionSets: state.questionSets.map(qs =>
+        qs.id === setId ? { ...qs, coAdminIds: qs.coAdminIds.filter(id => id !== adminIdToRemove) } : qs
+      )
+    }));
+  },
+
   questionSets: [],
   managingSetId: null,
   questions: [],
-  testState: 'HOME',
+  testState: 'LOGIN',
   currentQuestionIndex: 0,
   answers: [],
   timeRemainingSeconds: TOTAL_TIME_SECONDS,

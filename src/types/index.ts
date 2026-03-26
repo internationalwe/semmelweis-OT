@@ -13,9 +13,18 @@ export type Question = {
 
 export type Visibility = 'PUBLIC' | 'PRIVATE' | 'RESTRICTED' | 'MARKETPLACE';
 
+export type User = {
+  id: string;
+  name: string;
+  password?: string; // For the prototype auth
+  isAdmin: boolean;
+};
+
 export type QuestionSet = {
   id: string;
   name: string;
+  ownerId: string;
+  coAdminIds: string[]; // Additional users who can manage the set
   questions: Question[];
   visibility: Visibility;
   allowedIds?: string[]; // Used only if visibility is RESTRICTED
@@ -36,4 +45,4 @@ export type TestResult = {
   answers: Answer[];
 };
 
-export type TestState = 'HOME' | 'INPUT' | 'TAKING' | 'RESULT' | 'MANAGE_SET';
+export type TestState = 'LOGIN' | 'HOME' | 'INPUT' | 'TAKING' | 'RESULT' | 'MANAGE_SET' | 'EDIT_SET';

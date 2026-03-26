@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import type { Question } from '../types';
 
 export const InputScreen: React.FC = () => {
-  const { addQuestionSet, setTestState } = useTestStore();
+  const { addQuestionSet, setTestState, currentUser } = useTestStore();
   const [mode, setMode] = useState<'AUTO' | 'MANUAL'>('AUTO');
   const [setName, setSetName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,6 +51,8 @@ export const InputScreen: React.FC = () => {
         addQuestionSet({
           id: `set-${Date.now()}`,
           name: setName,
+          ownerId: currentUser?.id || 'unknown',
+          coAdminIds: [],
           questions: parsedQuestions,
           visibility: 'PRIVATE',
           allowedIds: []
@@ -89,6 +91,8 @@ export const InputScreen: React.FC = () => {
     addQuestionSet({
       id: `set-${Date.now()}`,
       name: setName,
+      ownerId: currentUser?.id || 'unknown',
+      coAdminIds: [],
       questions: manualQs,
       visibility: 'PRIVATE',
       allowedIds: []

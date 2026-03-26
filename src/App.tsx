@@ -1,4 +1,5 @@
 import { useTestStore } from './store/useTestStore';
+import { LoginScreen } from './components/LoginScreen';
 import { HomeScreen } from './components/HomeScreen';
 import { ManageScreen } from './components/ManageScreen';
 import { InputScreen } from './components/InputScreen';
@@ -10,6 +11,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#172b4d] font-sans antialiased">
+      {testState === 'LOGIN' && <LoginScreen />}
       {testState === 'HOME' && <HomeScreen />}
       {testState === 'INPUT' && <InputScreen />}
       {testState === 'TAKING' && <TestLayout />}
