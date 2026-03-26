@@ -33,7 +33,7 @@ export const LoginScreen: React.FC = () => {
         <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-lg shadow-blue-500/30">
           <BookOpen size={32} />
         </div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">OnTest Pro</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Vorit</h1>
       </div>
 
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100 p-8">

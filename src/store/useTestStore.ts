@@ -211,7 +211,12 @@ export const useTestStore = create<TestStore>()(
     }),
     {
       name: 'online-test-store',
-      partialize: (state) => ({ questionSets: state.questionSets }),
+      partialize: (state) => ({ 
+        questionSets: state.questionSets,
+        users: state.users,
+        currentUser: state.currentUser,
+        testState: state.testState,
+      }),
     }
   )
 );
